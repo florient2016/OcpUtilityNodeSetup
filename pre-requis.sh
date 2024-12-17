@@ -44,7 +44,7 @@ cat mac_addresses.txt
 
 # Input files
 mac_file="mac_addresses.txt"
-dhcp_file="./OcpUtilityNodeSetup/OcpUtility/vars/main.yml"
+dhcp_file="./OcpUtility/vars/main.yml"
 output_file="vars_updated.txt"
 
 # Check if both files exist
