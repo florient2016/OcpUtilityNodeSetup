@@ -28,7 +28,11 @@
 
 - name: Enable IP forwarding temporarily using shell
   ansible.builtin.shell: echo '1' > /proc/sys/net/ipv4/ip_forward
-  become: yes
+
+
+- name: Enable selinux for haproxy setsebool
+  ansible.builtin.shell: setsebool -P haproxy_connect_any=1
+
 
 # add firewalld services in external zone
 - name: Open required service ports
@@ -113,6 +117,7 @@
     - cockpit 
     - dhcpd
     - haproxy
+    - httpd
     - named
 
 - name: Comment out lines containing 8.8.8.8 in /etc/resolv.conf
@@ -126,7 +131,6 @@
 - name: Liste firewall rule
   ansible.builtin.shell: firewall-cmd --get-active-zones && firewall-cmd --list-all --zone=internal && firewall-cmd --list-all --zone=external
   register: output1
-  become: yes
 
 - name: print list
   debug: 
@@ -136,9 +140,19 @@
 - name: Validate dns configuration
   ansible.builtin.shell: "dig +noall +answer @{{ dhcpd_server_ip }} -x {{ dhcpd_server_ip }}"
   register: output2
-  become: yes
-
 
 - name: print dns test
   debug: 
     var: output2.stdout_lines
+
+
+- name: Test HTTP connection to 0.0.0.0:8080
+  ansible.builtin.uri:
+    url: "http://{{ dhcpd_server_ip }}:8080"
+    method: GET
+    status_code: 200
+  register: resul
+
+- name: Display connection test result
+  debug:
+    var: result

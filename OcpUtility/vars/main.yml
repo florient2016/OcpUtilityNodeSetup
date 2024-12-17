@@ -33,17 +33,17 @@ cluster_network: 237.84.2.178/14
 control_plane:
   - name: master1
     ip: 10.10.0.101
-    mac: 
+    mac: mac1
     etcd: 101
     srv: _etcd-server-ssl._tcp
   - name: master2
     ip: 10.10.0.102
-    mac:
+    mac: mac2
     etcd: 102
     srv: _etcd-server-ssl._tcp
   - name: master3
     ip: 10.10.0.103
-    mac:
+    mac: mac3
     etcd: 103
     srv: _etcd-server-ssl._tcp
 
@@ -53,10 +53,10 @@ control_plane:
 worker:
   - name: worker1
     ip: 10.10.0.104
-    mac:
+    mac: mac4
     etcd: 104
   - name: worker2
-    mac: 
+    mac: mac5
     etcd: 105
     ip: 10.10.0.105
 
