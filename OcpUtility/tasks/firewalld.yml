@@ -150,7 +150,7 @@
   ansible.builtin.uri:
     url: "http://{{ dhcpd_server_ip }}:8080"
     method: GET
-    status_code: 200
+    status_code: 403
   register: resul
 
 - name: Display connection test result
