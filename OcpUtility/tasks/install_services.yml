@@ -1,0 +1,10 @@
+- name: Install required packages
+  ansible.builtin.yum:
+    name:
+      - bind
+      - dhcp-server
+      - haproxy
+      - httpd
+      - nfs-utils
+      - firewalld
+    state: present

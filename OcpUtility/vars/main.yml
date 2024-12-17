@@ -1,0 +1,81 @@
+---
+# vars file for OpenShift Container PlatformUtility
+# This file contains all the variables used in the OcpUtility playbook
+# It is divided into sections, each section is related to a specific part of the playbook
+# Details information related to the utility node that will be used as a DHCP server
+# and as a DNS server
+hostname: utility.example.com
+domain_name: example.com
+dhcpd_server_ip: 10.10.0.90
+dhcpd_range_start: 10.10.0.100
+dhcpd_range_end: 10.10.0.120
+network_ip: 10.10.0.0/24
+
+# this value is used to create the reverse zone file
+#set details information related to ip reverse value
+#Noticed:  value was a last octet of the ip address
+reverse_value: 90
+
+# Noticed: this node is used to create the cluster and to install the control plane nodes
+#set details inforation related to bootstrap
+bootstrap_ip: 10.10.0.100
+bootstrap_hostname: bootstrap.example.com
+bootstrap_name: bootstrap
+
+
+# this section contains the cluster name, the network cidr and the cluster network
+#cluster details
+cluster_name: ocp4
+cluster_network: 237.84.2.178/14
+
+# Information related to the control plane nodes names, the IPs and the mac addresses of the control plane nodes
+#set control plane nodes names
+control_plane:
+  - name: master1
+    ip: 10.10.0.101
+    mac: 
+    etcd: 101
+    srv: _etcd-server-ssl._tcp
+  - name: master2
+    ip: 10.10.0.102
+    mac:
+    etcd: 102
+    srv: _etcd-server-ssl._tcp
+  - name: master3
+    ip: 10.10.0.103
+    mac:
+    etcd: 103
+    srv: _etcd-server-ssl._tcp
+
+
+# Set details information related to the worker nodes names, the IPs and the mac addresses of the worker nodes
+#set worker nodes names
+worker:
+  - name: worker1
+    ip: 10.10.0.104
+    mac:
+    etcd: 104
+  - name: worker2
+    mac: 
+    etcd: 105
+    ip: 10.10.0.105
+
+
+# this section contains the external and internal interfaces
+# the external interface is used to connect to the internet
+# the internal interface is used to connect to the ocp4 cluster
+external_interface: 
+  - name: ens18
+    ip: 192.168.0.7
+    gateway: 192.168.0.3
+internal_interface: 
+  - name: ens19
+    ip: 10.10.0.90
+    gateway: 10.10.0.1
+
+# this directory is used to store the registry data
+nfs_directory: /share/registry
+
+
+# this port is used to access httpd server
+httpd_port: 8080

@@ -1,0 +1,51 @@
+
+# This task creates the named configuration file by using a Jinja2 template.
+# The template file (named.conf.j2) is processed and the result is saved to
+# the specified destination path (/etc/named.conf).
+- name: Create named configuration file
+  ansible.builtin.template:
+    src: named.conf.j2
+    dest: /etc/named.conf
+
+# This task creates the zones directory if it doesn't exist.
+- name: create directory zones 
+  ansible.builtin.file:
+    path: /etc/named/zones
+    state: directory
+
+# This task creates the direct zone file by using a Jinja2 template.
+# The template file (db.domain.j2) is processed and the result is saved to
+# the specified destination path (/etc/named/zones/db.<domain_name>).
+- name: Create direct zone file
+  ansible.builtin.template:
+    src: db.domain.j2
+    dest: "/etc/named/zones/db.{{ domain_name }}"
+
+# This task creates the reverse zone file by using a Jinja2 template.
+# The template file (db.reserse.j2) is processed and the result is saved to
+# the specified destination path (/etc/named/zones/db.reverse).
+- name: Create reverse zone file
+  ansible.builtin.template:
+    src: db.reserse.j2
+    dest: /etc/named/zones/db.reverse
+
+# This task creates the file /etc/NetworkManager/conf.d/90-dns-none.conf if it doesn't exist.
+# This file is used to disable DNS for NetworkManager.
+- name: create this file /etc/NetworkManager/conf.d/90-dns-none.conf if not exist
+  ansible.builtin.file:
+    path: /etc/NetworkManager/conf.d/90-dns-none.conf
+    state: touch  
+
+# This task adds two lines to the 90-dns-none.conf file.
+# The first line is [main] and the second line is dns=none.
+# This is used to disable DNS for NetworkManager.
+- name: add this two ligne [main] dns=none to 90-dns-none.conf file
+  ansible.builtin.blockinfile:
+    path: /etc/NetworkManager/conf.d/90-dns-none.conf
+    block: |
+      [main]
+      dns=none
+   
+
+    
+    

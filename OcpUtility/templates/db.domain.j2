@@ -1,0 +1,43 @@
+$TTL 86400
+@   IN  SOA utility.{{ domain_name }}. contact.{{ domain_name }} (
+           5       ; Serial
+        3600       ; Refresh
+        1800       ; Retry
+        1209600    ; Expire
+        86400 )    ; Minimum TTL
+
+    IN  NS  utility.
+
+{{ hostname }}.   IN  A   {{ dhcpd_server_ip }}
+
+; Bootp servers definition
+{{ bootstrap_hostname }}.  IN  A   {{ bootstrap_ip }}
+
+; OCP control plane nodes
+{% for node in control_plane %}
+{{ node.name }}.{{ cluster_name }}.{{ domain_name }}. IN A {{ node.ip }}
+{% endfor %}
+
+; OCP worker nodes
+{% for node in worker %}
+{{ node.name }}.{{ cluster_name }}.{{ domain_name }}. IN A {{ node.ip }}
+{% endfor %}
+
+; OCP internal - load balancer
+api.{{ cluster_name }}.{{ domain_name }}. IN A {{ dhcpd_server_ip }}
+api-int.{{ cluster_name }}.{{ domain_name }}. IN A {{ dhcpd_server_ip }}
+*.apps.{{ cluster_name }}.{{ domain_name }}. IN A {{ dhcpd_server_ip }}
+
+; ETCD cluster setup
+{% for node in control_plane %}
+etcd-{{ node.etcd }}.{{ cluster_name }}.{{ domain_name }}. IN A {{ node.ip }}
+{% endfor %}
+
+; OCP internal SRV records
+{% for node in control_plane %}
+{{ node.srv }}.{{ cluster_name }}.{{ domain_name }}.   86400 IN SRV 0 10 2380 {{ node.etcd }}.{{ cluster_name }}
+{% endfor %}
+
+; OCP external connexion records
+oauth-openshift.apps.{{ cluster_name }}.{{ domain_name }}. IN A {{ dhcpd_server_ip }}
+console-openshift-console.apps.{{ cluster_name }}.{{ domain_name }}. IN A {{ dhcpd_server_ip }}

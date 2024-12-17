@@ -1,0 +1,32 @@
+$TTL 86400
+@   IN  SOA utility.{{ domain_name }}. contact.{{ domain_name }} (
+        5          ; Serial
+        3600       ; Refresh
+        1800       ; Retry
+        1209600    ; Expire
+        86400 )    ; Minimum TTL
+
+    IN  NS  utility.{{ domain_name }}.
+
+; control plane reverse
+
+{{ reverse_value }}  IN PTR {{ hostname }}.
+
+; control plane reverse
+{% for node in control_plane %}
+{{ node.etcd }}  IN PTR {{ node.name }}.{{ cluster_name }}.{{ domain_name }}.
+{% endfor %}
+
+; worker nodes
+{% for node in worker %}
+{{ node.etcd }}  IN PTR {{ node.name }}.{{ cluster_name }}.{{ domain_name }}.
+{% endfor %}
+
+; api reverse
+{{ reverse_value }}  IN PTR api.{{ cluster_name }}.{{ domain_name }}.
+
+; api-int reverse   
+{{ reverse_value }} IN PTR api-int.{{ cluster_name }}.{{ domain_name }}.
+
+; bootstrap reverse
+1  IN PTR {{ bootstrap_hostname }}.

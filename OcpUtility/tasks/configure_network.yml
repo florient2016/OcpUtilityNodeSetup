@@ -1,0 +1,38 @@
+- name: Set external ip address file
+  ansible.builtin.template:
+      src: templates/ifcfg-eth1.j2
+      dest: "/etc/sysconfig/network-scripts/ifcfg-{{ item.name }}"
+      mode: '0644'
+      owner: root
+      group: root
+  loop: "{{ external_interface }}"
+- name: Set internal set ip address file
+  ansible.builtin.template:
+      src: templates/ifcfg-eth0.j2
+      dest: "/etc/sysconfig/network-scripts/ifcfg-{{ item.name }}"
+      mode: '0644'
+      owner: root
+      group: root
+  loop: "{{ internal_interface }}"
+
+- name: Ensure IP forwarding is enabled in sysctl.conf
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^net.ipv4.ip_forward'
+    line: 'net.ipv4.ip_forward = 1'
+    state: present
+  become: yes
+
+
+#- name: IP forwarding /proc/sys/net/ipv4/ip_forward
+#  ansible.builtin.lineinfile:
+#    path: /proc/sys/net/ipv4/ip_forward
+#    line: '1'
+#    state: present
+#  become: yes
+
+- name: enabled masquerading with firewalld on boot external and internal interface
+  ansible.builtin.service:
+    name: firewalld
+    state: reloaded
+    enabled: yes

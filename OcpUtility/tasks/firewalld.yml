@@ -1,0 +1,144 @@
+#- name: Start and enable firewalld
+#  ansible.builtin.service:
+#    name: firewalld
+#    state: restarted
+#    enabled: yes
+
+- name: Disable the public zone
+  ansible.posix.firewalld:
+    zone: public
+    state: disabled
+    immediate: yes
+    permanent: yes
+
+
+- name: Disable the public zone
+  ansible.posix.firewalld:
+    zone: internal
+    state: enabled
+    immediate: yes
+    permanent: yes
+
+- name: Disable the public zone
+  ansible.posix.firewalld:
+    zone: external
+    state: enabled
+    immediate: yes
+    permanent: yes
+
+- name: Enable IP forwarding temporarily using shell
+  ansible.builtin.shell: echo '1' > /proc/sys/net/ipv4/ip_forward
+  become: yes
+
+# add firewalld services in external zone
+- name: Open required service ports
+  ansible.posix.firewalld:  
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+    zone: external
+  loop:
+    - http
+    - https
+    - dhcp
+    - ssh
+
+#add firewalld ports in external zone
+- name: Open additional ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+    zone: external
+  loop:
+    - 8080/tcp
+    - 6443/tcp
+    - 443/tcp
+    - 9000/tcp
+
+#add firewalld ports in internal zone
+- name: Open additional ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+    zone: internal
+  loop:
+    - 8080/tcp
+    - 6443/tcp
+    - 22623/tcp
+    - 53/udp
+    - 53/tcp
+    - 443/tcp
+
+#add firewalld services in internal zone
+- name: Open additional services
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+    zone: internal
+  loop:
+    - cockpit 
+    - dhcp
+    - dhcpv6-client
+    - http 
+    - https
+    - mdns
+    - mountd
+    - nfs
+    - rpc-bind
+    - samba-client
+    - ssh
+    - tftp
+
+
+- name: Reload firewalld to apply changes
+  ansible.posix.firewalld:
+    immediate: yes
+    state: enabled
+
+- name: Start and enable firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: restarted
+    enabled: yes
+
+- name: restart all services deploied by firewalld
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: restarted
+  ignore_errors: yes
+  loop:
+    - cockpit 
+    - dhcpd
+    - haproxy
+    - named
+
+- name: Comment out lines containing 8.8.8.8 in /etc/resolv.conf
+  ansible.builtin.lineinfile:
+    path: /etc/resolv.conf
+    regexp: '^(.*8\.8\.8\.8.*)$'
+    line: '# \1'
+    backrefs: yes
+
+
+- name: Liste firewall rule
+  ansible.builtin.shell: firewall-cmd --get-active-zones && firewall-cmd --list-all --zone=internal && firewall-cmd --list-all --zone=external
+  register: output1
+  become: yes
+
+- name: print list
+  debug: 
+    var: output1.stdout_lines
+
+
+- name: Validate dns configuration
+  ansible.builtin.shell: "dig +noall +answer @{{ dhcpd_server_ip }} -x {{ dhcpd_server_ip }}"
+  register: output2
+  become: yes
+
+
+- name: print dns test
+  debug: 
+    var: output2.stdout_lines

@@ -1,0 +1,39 @@
+authoritative;
+ddns-update-style interim;
+allow booting;
+allow bootp;
+allow unknown-clients;
+ignore client-updates;
+default-lease-time 14400;
+max-lease-time 14400;
+
+
+
+subnet 10.10.0.0 netmask 255.255.255.0 {
+ option routers                  {{ dhcpd_server_ip }}; # lan
+ option subnet-mask              255.255.255.0;
+ option domain-name              "{{ domain_name }}";
+ option domain-name-servers       {{ dhcpd_server_ip }};
+ option ntp-servers               {{ dhcpd_server_ip }};
+ range {{ dhcpd_range_start }} {{ dhcpd_range_end }};
+ next-server {{ dhcpd_server_ip }};
+ filename "pxelinux.0";
+}
+
+
+
+
+
+{% for node in control_plane %}
+host {{ node.name }} {
+ hardware ethernet {{ node.mac }};
+ fixed-address {{ node.ip }};
+}
+{% endfor %}
+
+{% for node in worker %}
+host {{ node.name }} {
+ hardware ethernet {{ node.mac }};
+ fixed-address {{ node.ip }};
+}
+{% endfor %}

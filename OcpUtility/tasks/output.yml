@@ -1,0 +1,2 @@
+- name: validate dns configuration with dig
+  shell: "dig +noall +answer @{{ dhcpd_server_ip }} api.{{ cluster_name }}.{{ domain_name }}"

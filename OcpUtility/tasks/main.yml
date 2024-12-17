@@ -1,0 +1,45 @@
+---
+# tasks file for OcpUtility
+# This playbook is used to set up the utility node
+# The tasks in this playbook will:
+# - Set the hostname of the node
+# - Install the required services
+# - Configure the network settings
+# - Set up the NFS server
+# - Configure the DNS server
+# - Configure the DHCP server
+# - Configure the HAProxy server
+# - Configure the Firewalld service
+
+# Set the hostname of the node
+- name: set hostname
+  ansible.builtin.shell: hostnamectl hostname "{{ hostname }}"
+
+# Install the required services
+- name: Install required services
+  import_tasks: install_services.yml
+
+# Configure the network settings
+- name: Configure network settings
+  import_tasks: configure_network.yml
+
+# Set up the NFS server
+- name: Set up NFS
+  import_tasks: setup_nfs.yml
+
+# Configure the DNS server
+- name: Configure DNS
+  import_tasks: configure_dns.yml
+
+# Configure the DHCP server
+- name: Configure DHCP
+  import_tasks: configure_dhcp.yml
+
+# Configure the HAProxy server
+- name: Configure HAProxy
+  import_tasks: configure_haproxy.yml
+
+# Configure the Firewalld service
+- name: Configure Firewalld
+  import_tasks: firewalld.yml
+

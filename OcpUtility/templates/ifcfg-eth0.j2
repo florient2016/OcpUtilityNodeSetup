@@ -1,0 +1,9 @@
+{% for internal_interface in internal_interface %}
+DEVICE={{ internal_interface.name }}
+ONBOOT=yes
+BOOTPROTO=none
+IPADDR={{ internal_interface.ip }}
+NETMASK=255.255.255.0
+GATEWAY={{ internal_interface.gateway }}
+ZONE=internal
+{% endfor %}

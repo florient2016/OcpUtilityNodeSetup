@@ -1,0 +1,31 @@
+- name: Create NFS directory
+  ansible.builtin.file:
+    path: "{{ nfs_directory }}"
+    state: directory
+    mode: '0777'
+    owner: nobody
+    group: nobody
+
+- name: Enable and start NFS services
+  ansible.builtin.service:
+    name: nfs-server
+    state: started
+    enabled: yes
+
+- name: export du repertoire
+  ansible.builtin.lineinfile:
+    path: /etc/exports
+    line: "{{ nfs_directory }} {{ network_ip }}(rw,sync,root_squash,no_subtree_check,no_wdelay)"  
+    state: present
+
+- name: run exports -rv command
+  ansible.builtin.command:
+    cmd: "exportfs -rv" 
+  register: exportfs_result
+
+- name: output exportfs result
+  debug:
+    var: exportfs_result
+    
+
+
