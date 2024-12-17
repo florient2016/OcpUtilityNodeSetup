@@ -7,5 +7,20 @@
     src: dhcpd.conf.j2
     dest: /etc/dhcp/dhcpd.conf
 
+# This task enables and starts the DHCP service.
+# It ensures that the DHCP service (dhcpd) is running and set to start 
+# automatically on boot.
+- name: Enable and start DHCP service
+  ansible.builtin.service:
+    name: dhcpd
+    state: started
+    enabled: yes
 
+- name: Set httpd to listen on 0.0.0.0:8080
+  ansible.builtin.lineinfile:
+    path: /etc/httpd/conf/httpd.conf  # Adjust the path based on your system
+    regexp: '^Listen'
+    line: 'Listen 0.0.0.0:8080'
+    state: present
+    backup: yes 
 
