@@ -21,3 +21,5 @@ EOF
 
 
 echo 'ansible  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+cp -R ../OcpUtilityNodeSetup /home/ansible
