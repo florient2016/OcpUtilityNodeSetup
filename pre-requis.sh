@@ -31,9 +31,25 @@ EOF
 # Add the ansible user to the sudoers file with full access
 echo 'ansible  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
 
+
+# Check for the correct number of arguments
+if [[ $# -ne 1 ]]; then
+  echo "Usage: $0 <number_of_nodes>"
+  exit 1
+fi
+
+# Get the number of nodes from the first argument
+num_nodes=$1
+
+# Validate that the input is a positive integer
+if ! [[ "$num_nodes" =~ ^[0-9]+$ ]] || [[ "$num_nodes" -le 0 ]]; then
+  echo "Error: Number of nodes must be a positive integer."
+  exit 1
+fi
+
 # Generate a list of random MAC addresses
-number_node=5
-for i in $(seq 1 $number_node); do 
+
+for i in $(seq 1 $num_nodes); do 
     # Print a random MAC address in the format "52:54:00:xx:xx:xx"
     printf '52:54:00:%02x:%02x:%02x\n' $((RANDOM%256)) $((RANDOM%256)) $i
 done > mac_addresses.txt
